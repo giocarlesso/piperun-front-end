@@ -1,4 +1,9 @@
-<template> <div></div></template>
+<template>
+  <div>
+    <label for="title">Título</label>
+    <input type="text" name="title" />
+  </div>
+</template>
 
 <script>
   export default {};
