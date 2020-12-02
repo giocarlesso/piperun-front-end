@@ -31,7 +31,7 @@
 </template>
 
 <script>
-  import Authenticate from '../gateway/Authenticate';
+  import AuthenticateHelper from '../gateway/AuthenticateHelper';
 
   export default {
     data() {
@@ -42,7 +42,7 @@
     },
     methods: {
       authenticate() {
-        Authenticate.login(this.email, this.password)
+        AuthenticateHelper.login(this.email, this.password)
           .then(() => {
             this.$router.push({
               name: 'Home',

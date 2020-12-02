@@ -6,35 +6,14 @@
     <table class="table">
       <thead>
         <th>Título</th>
-        <th>Responsável</th>
         <th>Status</th>
-        <th>Tipo</th>
-        <th>Criada</th>
-        <th>Finalizada</th>
-        <th>Opções</th>
+        <th>Responsável</th>
       </thead>
       <tbody>
         <tr v-for="activity in activities" :key="activity.id">
           <td>{{ activity.title }}</td>
-          <td>{{ getUserName(activity.owner_id) }}</td>
           <td>{{ activity.status }}</td>
-          <td>{{ getType(activity.activity_type) }}</td>
-          <td>{{ formatDate(activity.created_at) }}</td>
-          <td>{{ formatDate(activity.delivery_date) }}</td>
-          <td>
-            <button
-              v-if="activity.status !== 2"
-              @click="finishActivity(activity)"
-            >
-              Concluir
-            </button>
-            <button @click="updateActivity(activity)">
-              Editar
-            </button>
-            <button @click="deleteActivity(activity.id)">
-              Excluir
-            </button>
-          </td>
+          <td>{{ findUserName(activity.owner_id) }}</td>
         </tr>
       </tbody>
     </table>
@@ -42,11 +21,38 @@
 </template>
 
 <script>
+  import ActivityHelper from '../gateway/ActivityHelper';
+  import UserHelper from '../gateway/UserHelper';
+
   export default {
     data() {
       return {
         activities: [],
+        users: [],
       };
+    },
+
+    methods: {
+      getActitivities() {
+        ActivityHelper.getActitivitiesList().then(
+          (res) => (this.activities = res.data.data)
+        );
+      },
+
+      findUserName(owner_id) {
+        const foundUser = this.users.find((user) => user.id === owner_id);
+        return foundUser.name;
+      },
+
+      getUsers() {
+        UserHelper.getUsersList().then((res) => (this.users = res.data.data));
+        console.log(this.users);
+      },
+    },
+
+    mounted() {
+      this.getActitivities();
+      this.getUsers();
     },
   };
 </script>
