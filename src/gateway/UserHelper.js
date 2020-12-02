@@ -1,7 +1,7 @@
 import api from '../config/api';
 
 export default {
-  getUsersList: () => {
+  getUsersList: async () => {
     return api.get('/users', {
       headers: {
         'Content-Type': 'application/json',
