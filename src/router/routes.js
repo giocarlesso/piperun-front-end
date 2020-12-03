@@ -23,6 +23,15 @@ const routes = [
     name: 'CreateActivity',
     component: CreateActivity,
   },
+
+  {
+    path: '/create-activity/:activityId',
+    name: 'EditActivity',
+    component: CreateActivity,
+    props: {
+      activityId: ':activityId',
+    },
+  },
 ];
 
 const router = new VueRouter({ routes });

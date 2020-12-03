@@ -8,12 +8,24 @@
         <th>Título</th>
         <th>Status</th>
         <th>Responsável</th>
+        <th>Ações</th>
       </thead>
       <tbody>
         <tr v-for="activity in activities" :key="activity.id">
           <td>{{ activity.title }}</td>
           <td>{{ activity.status }}</td>
           <td>{{ findUserName(activity.owner_id) }}</td>
+          <td>
+            <button @click="editActivity(activity.id)">
+              Editar
+            </button>
+            <button>
+              Concluir
+            </button>
+            <button @click="deleteActivity(activity.id)">
+              Excluir
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -50,10 +62,22 @@
         return foundUser.name;
       },
 
-      async getUsers() {
-        await UserHelper.getUsersList().then(
-          (res) => (this.users = res.data.data)
-        );
+      getUsers() {
+        UserHelper.getUsersList().then((res) => (this.users = res.data.data));
+      },
+
+      deleteActivity(activityId) {
+        ActivityHelper.deleteActivity(activityId).then(() => {
+          this.getActitivities();
+        });
+      },
+
+      editActivity(activityId) {
+        this.$router.push({
+          // path: `/create-activity/${activityId}`,
+          name: 'EditActivity',
+          params: { activityId },
+        });
       },
     },
 

@@ -78,20 +78,20 @@
         });
       },
 
-      getActivityTypes() {
-        ActivityHelper.getActitivitiesTypes().then((res) => {
+      async getActivityTypes() {
+        await ActivityHelper.getActitivitiesTypes().then((res) => {
           this.activityTypes = res.data.data;
         });
       },
 
-      getActitivities() {
-        ActivityHelper.getActitivitiesList().then(
+      async getActitivities() {
+        await ActivityHelper.getActitivitiesList().then(
           (res) => (this.activities = res.data.data)
         );
       },
 
-      createActivity() {
-        ActivityHelper.createActivity(this.activityData).then(() =>
+      async createActivity() {
+        await ActivityHelper.createActivity(this.activityData).then(() =>
           this.$router.push({ name: 'Home' })
         );
       },
