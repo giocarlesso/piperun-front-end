@@ -1,12 +1,106 @@
 <template>
-  <div>
+  <form @submit.prevent="createActivity">
     <label for="title">Título</label>
-    <input type="text" name="title" />
-  </div>
+    <input type="text" name="title" v-model="activityData.title" />
+
+    <select v-model="activityData.owner_id">
+      <option value="" disabled>Responsável</option>
+      <option v-for="owner in owners" :key="owner.id" :value="owner.id">
+        {{ owner.name }}
+      </option>
+    </select>
+
+    <select v-model="activityData.activity_type_id">
+      <option value="" disabled>Tipo</option>
+      <option v-for="type in activityTypes" :key="type.id" :value="type.id">
+        {{ type.name }}
+      </option>
+    </select>
+
+    <select v-model="activityData.status">
+      <option value="" disabled>Status</option>
+      <option v-for="status in statusTypes" :key="status.id" :value="status.id">
+        {{ status.name }}
+      </option>
+    </select>
+
+    <button type="submit">Criar Atividade</button>
+  </form>
 </template>
 
 <script>
-  export default {};
+  import ActivityHelper from '../gateway/ActivityHelper';
+  import UserHelper from '../gateway/UserHelper';
+
+  export default {
+    data() {
+      return {
+        owners: [],
+        activityTypes: [],
+        statusTypes: [
+          {
+            id: 0,
+            name: 'Aberta',
+          },
+          {
+            id: 1,
+            name: 'Em progresso',
+          },
+          {
+            id: 2,
+            name: 'Finalizada',
+          },
+          {
+            id: 3,
+            name: 'Cancelada',
+          },
+          {
+            id: 4,
+            name: 'Escondida',
+          },
+        ],
+        activityData: {
+          account_id: window.localStorage.getItem('userData'),
+          owner_id: 0,
+          title: '',
+          activity_type_id: 0,
+          status: 0,
+          priority: 1,
+          description: 'Teste',
+        },
+      };
+    },
+
+    methods: {
+      async getUsers() {
+        await UserHelper.getUsersList().then((res) => {
+          this.owners = res.data.data;
+        });
+      },
+
+      getActivityTypes() {
+        ActivityHelper.getActitivitiesTypes().then((res) => {
+          this.activityTypes = res.data.data;
+        });
+      },
+
+      getActitivities() {
+        ActivityHelper.getActitivitiesList().then(
+          (res) => (this.activities = res.data.data)
+        );
+      },
+
+      createActivity() {
+        ActivityHelper.createActivity(this.activityData).then(() =>
+          this.$router.push({ name: 'Home' })
+        );
+      },
+    },
+    mounted() {
+      this.getActivityTypes();
+      this.getUsers();
+    },
+  };
 </script>
 
 <style></style>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button @click="createNewActivity">
+    <button @click.prevent.stop="createNewActivity">
       Adicionar Nova Atividade
     </button>
     <table class="table">
@@ -40,16 +40,20 @@
       },
 
       createNewActivity() {
-        this.$router.push('/create-activity');
+        this.$router.push({ name: 'CreateActivity' });
       },
 
       findUserName(owner_id) {
         const foundUser = this.users.find((user) => user.id === owner_id);
+        JSON.stringify(foundUser);
+
         return foundUser.name;
       },
 
-      getUsers() {
-        UserHelper.getUsersList().then((res) => (this.users = res.data.data));
+      async getUsers() {
+        await UserHelper.getUsersList().then(
+          (res) => (this.users = res.data.data)
+        );
       },
     },
 
