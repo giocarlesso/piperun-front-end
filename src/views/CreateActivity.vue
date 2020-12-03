@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="createActivity">
+  <form @submit.prevent="sendActivity">
     <label for="title">Título</label>
     <input type="text" name="title" v-model="activityData.title" />
 
@@ -35,6 +35,7 @@
   export default {
     data() {
       return {
+        isEditing: false,
         owners: [],
         activityTypes: [],
         statusTypes: [
@@ -48,7 +49,7 @@
           },
           {
             id: 2,
-            name: 'Finalizada',
+            name: 'Concluído',
           },
           {
             id: 3,
@@ -90,10 +91,21 @@
         );
       },
 
-      async createActivity() {
-        await ActivityHelper.createActivity(this.activityData).then(() =>
-          this.$router.push({ name: 'Home' })
-        );
+      async sendActivity() {
+        if (this.isEditing) {
+          await ActivityHelper.updateActivity(
+            this.activityData,
+            this.$route.params.activityId
+          ).then(() => {
+            this.isEditing = false;
+            this.$router.push({ name: 'Home' });
+          });
+        } else {
+          await ActivityHelper.createActivity(this.activityData).then(() => {
+            this.isEditing = false;
+            this.$router.push({ name: 'Home' });
+          });
+        }
       },
 
       getSpecificActivity() {
@@ -109,10 +121,12 @@
         );
       },
     },
+
     mounted() {
       console.log(this.$route.params.activityId);
       if (this.$route.params.activityId) {
         this.getSpecificActivity();
+        this.isEditing = true;
       }
       this.getActivityTypes();
       this.getUsers();

@@ -61,4 +61,13 @@ export default {
       },
     });
   },
+
+  updateActivity: (activityData, activityId) => {
+    return api.put('/activities/' + activityId, activityData, {
+      headers: {
+        'Content-Type': 'application/json',
+        Token: localStorage.getItem('Token'),
+      },
+    });
+  },
 };

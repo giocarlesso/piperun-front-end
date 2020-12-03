@@ -13,7 +13,7 @@
       <tbody>
         <tr v-for="activity in activities" :key="activity.id">
           <td>{{ activity.title }}</td>
-          <td>{{ activity.status }}</td>
+          <td>{{ getStatusName(activity.status) }}</td>
           <td>{{ findUserName(activity.owner_id) }}</td>
           <td>
             <button @click="editActivity(activity.id)">
@@ -41,25 +41,40 @@
       return {
         activities: [],
         users: [],
+        statusTypes: [
+          {
+            id: 0,
+            name: 'Aberta',
+          },
+          {
+            id: 1,
+            name: 'Em progresso',
+          },
+          {
+            id: 2,
+            name: 'Concluído',
+          },
+          {
+            id: 3,
+            name: 'Cancelada',
+          },
+          {
+            id: 4,
+            name: 'Escondida',
+          },
+        ],
       };
     },
 
     methods: {
       getActitivities() {
-        ActivityHelper.getActitivitiesList().then(
-          (res) => (this.activities = res.data.data)
-        );
+        ActivityHelper.getActitivitiesList().then((res) => {
+          this.activities = res.data.data;
+        });
       },
 
       createNewActivity() {
         this.$router.push({ name: 'CreateActivity' });
-      },
-
-      findUserName(owner_id) {
-        const foundUser = this.users.find((user) => user.id === owner_id);
-        JSON.stringify(foundUser);
-
-        return foundUser.name;
       },
 
       getUsers() {
@@ -79,11 +94,24 @@
           params: { activityId },
         });
       },
+
+      getStatusName(statusId) {
+        const foundStatus = this.statusTypes.find(
+          (status) => status.id === statusId
+        );
+        return foundStatus.name;
+      },
+
+      findUserName(owner_id) {
+        const foundUser = this.users.find((user) => user.id === owner_id);
+        JSON.stringify(foundUser);
+        return foundUser.name;
+      },
     },
 
     mounted() {
-      this.getActitivities();
       this.getUsers();
+      this.getActitivities();
     },
   };
 </script>
