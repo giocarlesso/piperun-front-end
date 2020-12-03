@@ -4,27 +4,27 @@
     <input type="text" name="title" v-model="activityData.title" />
 
     <select v-model="activityData.owner_id">
-      <option value="" disabled>Responsável</option>
+      <option value="Responsável" disabled>Responsável</option>
       <option v-for="owner in owners" :key="owner.id" :value="owner.id">
         {{ owner.name }}
       </option>
     </select>
 
     <select v-model="activityData.activity_type_id">
-      <option value="" disabled>Tipo</option>
+      <option value="Tipo" disabled>Tipo</option>
       <option v-for="type in activityTypes" :key="type.id" :value="type.id">
         {{ type.name }}
       </option>
     </select>
 
     <select v-model="activityData.status">
-      <option value="" disabled>Status</option>
+      <option value="Status" disabled>Status</option>
       <option v-for="status in statusTypes" :key="status.id" :value="status.id">
         {{ status.name }}
       </option>
     </select>
 
-    <button type="submit">Criar Atividade</button>
+    <button type="submit">Enviar</button>
   </form>
 </template>
 
@@ -95,8 +95,25 @@
           this.$router.push({ name: 'Home' })
         );
       },
+
+      getSpecificActivity() {
+        ActivityHelper.getSpecificActivity(this.$route.params.activityId).then(
+          (res) => {
+            const selectedActivity = res.data.data;
+            this.activityData.title = selectedActivity.title;
+            this.activityData.owner_id = selectedActivity.owner_id;
+            this.activityData.activity_type_id =
+              selectedActivity.activity_type_id;
+            this.activityData.status = selectedActivity.status;
+          }
+        );
+      },
     },
     mounted() {
+      console.log(this.$route.params.activityId);
+      if (this.$route.params.activityId) {
+        this.getSpecificActivity();
+      }
       this.getActivityTypes();
       this.getUsers();
     },

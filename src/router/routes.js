@@ -28,9 +28,6 @@ const routes = [
     path: '/create-activity/:activityId',
     name: 'EditActivity',
     component: CreateActivity,
-    props: {
-      activityId: ':activityId',
-    },
   },
 ];
 

@@ -52,4 +52,13 @@ export default {
         console.log('Delete Activities', err);
       });
   },
+
+  getSpecificActivity: (activityId) => {
+    return api.get('/activities/' + activityId, {
+      headers: {
+        'Content-Type': 'application/json',
+        Token: localStorage.getItem('Token'),
+      },
+    });
+  },
 };
