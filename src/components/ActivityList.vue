@@ -13,7 +13,7 @@
       <tbody>
         <tr v-for="activity in activities" :key="activity.id">
           <td>{{ activity.title }}</td>
-          <td>{{ getStatusName(activity.status) }}</td>
+          <td>{{ findStatusName(activity.status) }}</td>
           <td>{{ findUserName(activity.owner_id) }}</td>
           <td>
             <button @click="editActivity(activity.id)">
@@ -67,18 +67,8 @@
     },
 
     methods: {
-      getActitivities() {
-        ActivityHelper.getActitivitiesList().then((res) => {
-          this.activities = res.data.data;
-        });
-      },
-
       createNewActivity() {
         this.$router.push({ name: 'CreateActivity' });
-      },
-
-      getUsers() {
-        UserHelper.getUsersList().then((res) => (this.users = res.data.data));
       },
 
       deleteActivity(activityId) {
@@ -95,7 +85,17 @@
         });
       },
 
-      getStatusName(statusId) {
+      getActitivities() {
+        ActivityHelper.getActitivitiesList().then((res) => {
+          this.activities = res.data.data;
+        });
+      },
+
+      getUsers() {
+        UserHelper.getUsersList().then((res) => (this.users = res.data.data));
+      },
+
+      findStatusName(statusId) {
         const foundStatus = this.statusTypes.find(
           (status) => status.id === statusId
         );
