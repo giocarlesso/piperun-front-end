@@ -29,7 +29,7 @@ export default {
 
   createActivity: (activityData) => {
     return api
-      .post('activities', activityData, {
+      .post('/activities', activityData, {
         headers: {
           'Content-Type': 'application/json',
           Token: localStorage.getItem('Token'),
@@ -37,6 +37,19 @@ export default {
       })
       .catch((err) => {
         console.log('Create Activity', err);
+      });
+  },
+
+  deleteActivity: (activityId) => {
+    return api
+      .delete('/activities/' + activityId, {
+        headers: {
+          'Content-Type': 'application/json',
+          Token: localStorage.getItem('Token'),
+        },
+      })
+      .catch((err) => {
+        console.log('Delete Activities', err);
       });
   },
 };
