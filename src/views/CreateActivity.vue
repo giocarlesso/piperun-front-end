@@ -123,7 +123,6 @@
     },
 
     mounted() {
-      console.log(this.$route.params.activityId);
       if (this.$route.params.activityId) {
         this.getSpecificActivity();
         this.isEditing = true;

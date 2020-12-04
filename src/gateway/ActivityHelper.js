@@ -70,4 +70,19 @@ export default {
       },
     });
   },
+
+  concludeActivity: (activityId, formatedDate, status) => {
+    return api
+      .put(
+        '/activities/' + activityId,
+        { end_at: formatedDate, status: status },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Token: localStorage.getItem('Token'),
+          },
+        }
+      )
+      .catch((err) => console.log('Conclude Activity', err));
+  },
 };

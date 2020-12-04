@@ -19,7 +19,7 @@
             <button @click="editActivity(activity.id)">
               Editar
             </button>
-            <button>
+            <button @click="concludeActivity(activity.id)">
               Concluir
             </button>
             <button @click="deleteActivity(activity.id)">
@@ -35,6 +35,7 @@
 <script>
   import ActivityHelper from '../gateway/ActivityHelper';
   import UserHelper from '../gateway/UserHelper';
+  import moment from 'moment';
 
   export default {
     data() {
@@ -85,10 +86,20 @@
         });
       },
 
-      getActitivities() {
-        ActivityHelper.getActitivitiesList().then((res) => {
+      async getActitivities() {
+        await ActivityHelper.getActitivitiesList().then((res) => {
           this.activities = res.data.data;
         });
+      },
+
+      concludeActivity(activityId) {
+        const formatedDate = moment(new Date()).format();
+        const status = 2;
+        ActivityHelper.concludeActivity(
+          activityId,
+          formatedDate,
+          status
+        ).then(() => this.getActitivities());
       },
 
       getUsers() {
