@@ -9,18 +9,20 @@
       </button>
     </div>
 
-    <div v-if="isFiltering">
+    <div class="filter-container" v-if="isFiltering">
       <label for="dete-from">Data Inicial</label>
       <datepicker v-model="filter.dateFrom" name="date-from"></datepicker>
       <label for="dete-to">Data Final</label>
       <datepicker v-model="filter.dateTo" name="date-to"></datepicker>
-      <button class="btn-filter" @click="getActitivitiesByDate">
-        Mostrat Filtrar
-      </button>
-      <button @click="resetFilter">Cancelar Filtro</button>
+      <div class="filter-buttons">
+        <button class="btn-apply-filter" @click="getActitivitiesByDate">
+          Filtrar
+        </button>
+        <button @click="resetFilter">Cancelar Filtro</button>
+      </div>
     </div>
 
-    <table class="table">
+    <table v-if="this.activities.length > 0" class="table">
       <thead>
         <th>Título</th>
         <th>Status</th>
@@ -46,18 +48,30 @@
         </tr>
       </tbody>
     </table>
+    <div class="empty-list" v-else>
+      <p>Parece que ainda não há nenhuma atividade</p>
+    </div>
+
+    <base-toast
+      @close="hideToast"
+      v-if="toast.showToast"
+      :message="toast.toastMessage"
+      :type="toast.toastType"
+    ></base-toast>
   </div>
 </template>
 
 <script>
   import ActivityHelper from '../gateway/ActivityHelper';
   import UserHelper from '../gateway/UserHelper';
+  import BaseToast from '../components/BaseToast';
   import moment from 'moment';
   import Datepicker from 'vuejs-datepicker';
 
   export default {
     components: {
       Datepicker,
+      BaseToast,
     },
 
     data() {
@@ -65,6 +79,12 @@
         activities: [],
         users: [],
         isFiltering: false,
+        toast: {
+          showToast: false,
+          toastMessage: '',
+          toastType: '',
+        },
+
         filter: {
           dateFrom: '',
           dateTo: '',
@@ -100,9 +120,22 @@
       },
 
       deleteActivity(activityId) {
-        ActivityHelper.deleteActivity(activityId).then(() => {
-          this.getActitivities();
-        });
+        ActivityHelper.deleteActivity(activityId)
+          .then(() => {
+            this.sendDataToToast(
+              'Atividade removida com sucesso',
+              'Sucesso',
+              true
+            );
+            this.getActitivities();
+          })
+          .catch(() => {
+            this.sendDataToToast(
+              'Erro ao tentar deletar a atividade',
+              'Sucesso',
+              true
+            );
+          });
       },
 
       editActivity(activityId) {
@@ -114,9 +147,17 @@
       },
 
       async getActitivities() {
-        await ActivityHelper.getActitivitiesList().then((res) => {
-          this.activities = res.data.data;
-        });
+        await ActivityHelper.getActitivitiesList()
+          .then((res) => {
+            this.activities = res.data.data;
+          })
+          .catch(() => {
+            this.sendDataToToast(
+              'Erro ao tentar receber a lista de atividades',
+              'Erro',
+              true
+            );
+          });
       },
 
       getActitivitiesByDate() {
@@ -125,24 +166,32 @@
         this.filter.dateTo = moment(this.filter.dateTo)
           .add(1, 'days')
           .format();
-
         ActivityHelper.getFilteredActivityByDate({
           start_at_start: this.filter.dateFrom,
           start_at_end: this.filter.dateTo,
         }).then((res) => {
           this.activities = res.data.data;
-          console.log(this.activities);
+          this.sendDataToToast(
+            'Atividades filtradas com sucesso',
+            'Sucesso',
+            true
+          );
         });
       },
 
       concludeActivity(activityId) {
         const formatedDate = moment(new Date()).format();
         const status = 2;
-        ActivityHelper.concludeActivity(
-          activityId,
-          formatedDate,
-          status
-        ).then(() => this.getActitivities());
+        ActivityHelper.concludeActivity(activityId, formatedDate, status).then(
+          () => {
+            this.sendDataToToast(
+              'Atividade concluída com sucesso',
+              'Sucesso',
+              true
+            );
+            this.getActitivities();
+          }
+        );
       },
 
       getUsers() {
@@ -171,6 +220,20 @@
         this.filter.dateFrom = null;
         this.filter.dateTo = null;
         this.getActitivities();
+      },
+
+      sendDataToToast(message, type, show) {
+        this.toast.toastMessage = message;
+        this.toast.toastType = type;
+        this.toast.showToast = show;
+
+        setTimeout(() => {
+          this.toast.showToast = false;
+        }, 5000);
+      },
+
+      hideToast() {
+        this.toast.showToast = false;
       },
     },
 
@@ -239,5 +302,30 @@
 
   .btn-filter:hover {
     background-color: #067f98;
+  }
+
+  .btn-apply-filter {
+    background-color: #20b0ce;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    margin-right: 10px;
+  }
+
+  .empty-list {
+    height: 50vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+  }
+
+  .filter-container {
+    margin-top: 10px;
+    display: flex;
+  }
+
+  .filter-buttons {
+    display: flex;
   }
 </style>
