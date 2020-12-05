@@ -1,15 +1,22 @@
 <template>
-  <div>
-    <button @click.prevent.stop="createNewActivity">
-      Adicionar Nova Atividade
-    </button>
+  <div class="main">
+    <div class="top-div">
+      <button class="btn-new" @click.prevent.stop="createNewActivity">
+        Adicionar Nova Atividade
+      </button>
+      <button class="btn-filter" @click="toggleFilter">
+        Mostrar Filtros
+      </button>
+    </div>
 
-    <div>
+    <div v-if="isFiltering">
       <label for="dete-from">Data Inicial</label>
       <datepicker v-model="filter.dateFrom" name="date-from"></datepicker>
       <label for="dete-to">Data Final</label>
       <datepicker v-model="filter.dateTo" name="date-to"></datepicker>
-      <button @click="getActitivitiesByDate">Filtrar</button>
+      <button class="btn-filter" @click="getActitivitiesByDate">
+        Mostrat Filtrar
+      </button>
       <button @click="resetFilter">Cancelar Filtro</button>
     </div>
 
@@ -57,6 +64,7 @@
       return {
         activities: [],
         users: [],
+        isFiltering: false,
         filter: {
           dateFrom: '',
           dateTo: '',
@@ -114,11 +122,8 @@
       getActitivitiesByDate() {
         //const dateFormat = 'YYYYY-MM-DD';
         this.filter.dateFrom = moment(this.filter.dateFrom).format();
-        this.filter.dateTo = moment
-          .add(
-            1,
-            'days'
-          )(this.filter.dateTo)
+        this.filter.dateTo = moment(this.filter.dateTo)
+          .add(1, 'days')
           .format();
 
         ActivityHelper.getFilteredActivityByDate({
@@ -157,6 +162,11 @@
         return foundUser.name;
       },
 
+      toggleFilter() {
+        this.isFiltering = !this.isFiltering;
+        this.resetFilter();
+      },
+
       resetFilter() {
         this.filter.dateFrom = null;
         this.filter.dateTo = null;
@@ -172,6 +182,9 @@
 </script>
 
 <style>
+  .main {
+    margin-left: 130px;
+  }
   .table {
     border: 1px solid #191919;
     border-collapse: collapse;
@@ -196,5 +209,35 @@
 
   tfoot td {
     border: none;
+  }
+
+  .btn-new {
+    width: 20%;
+    height: 30px;
+    font-size: 16px;
+    background-color: #4caf50;
+    border: none;
+    border-radius: 3px;
+    color: white;
+  }
+
+  .btn-new:hover {
+    background-color: #145e17;
+  }
+
+  .top-div {
+    display: flex;
+  }
+
+  .btn-filter {
+    margin-left: 10px;
+    background-color: #20b0ce;
+    color: white;
+    border: none;
+    border-radius: 3px;
+  }
+
+  .btn-filter:hover {
+    background-color: #067f98;
   }
 </style>
