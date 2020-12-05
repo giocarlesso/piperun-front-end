@@ -3,6 +3,16 @@
     <button @click.prevent.stop="createNewActivity">
       Adicionar Nova Atividade
     </button>
+
+    <div>
+      <label for="dete-from">Data Inicial</label>
+      <datepicker v-model="filter.dateFrom" name="date-from"></datepicker>
+      <label for="dete-to">Data Final</label>
+      <datepicker v-model="filter.dateTo" name="date-to"></datepicker>
+      <button @click="getActitivitiesByDate">Filtrar</button>
+      <button @click="resetFilter">Cancelar Filtro</button>
+    </div>
+
     <table class="table">
       <thead>
         <th>Título</th>
@@ -36,12 +46,21 @@
   import ActivityHelper from '../gateway/ActivityHelper';
   import UserHelper from '../gateway/UserHelper';
   import moment from 'moment';
+  import Datepicker from 'vuejs-datepicker';
 
   export default {
+    components: {
+      Datepicker,
+    },
+
     data() {
       return {
         activities: [],
         users: [],
+        filter: {
+          dateFrom: '',
+          dateTo: '',
+        },
         statusTypes: [
           {
             id: 0,
@@ -92,6 +111,25 @@
         });
       },
 
+      getActitivitiesByDate() {
+        //const dateFormat = 'YYYYY-MM-DD';
+        this.filter.dateFrom = moment(this.filter.dateFrom).format();
+        this.filter.dateTo = moment
+          .add(
+            1,
+            'days'
+          )(this.filter.dateTo)
+          .format();
+
+        ActivityHelper.getFilteredActivityByDate({
+          start_at_start: this.filter.dateFrom,
+          start_at_end: this.filter.dateTo,
+        }).then((res) => {
+          this.activities = res.data.data;
+          console.log(this.activities);
+        });
+      },
+
       concludeActivity(activityId) {
         const formatedDate = moment(new Date()).format();
         const status = 2;
@@ -117,6 +155,12 @@
         const foundUser = this.users.find((user) => user.id === owner_id);
         JSON.stringify(foundUser);
         return foundUser.name;
+      },
+
+      resetFilter() {
+        this.filter.dateFrom = null;
+        this.filter.dateTo = null;
+        this.getActitivities();
       },
     },
 

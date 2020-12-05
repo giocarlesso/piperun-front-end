@@ -3,26 +3,44 @@
     <label for="title">Título</label>
     <input type="text" name="title" v-model="activityData.title" />
 
-    <select v-model="activityData.owner_id">
-      <option value="Responsável" disabled>Responsável</option>
-      <option v-for="owner in owners" :key="owner.id" :value="owner.id">
-        {{ owner.name }}
-      </option>
-    </select>
+    <div>
+      <label for="">Responsável</label>
+      <select v-model="activityData.owner_id">
+        <option value="Responsável" disabled>Responsável</option>
+        <option v-for="owner in owners" :key="owner.id" :value="owner.id">
+          {{ owner.name }}
+        </option>
+      </select>
+    </div>
 
-    <select v-model="activityData.activity_type_id">
-      <option value="Tipo" disabled>Tipo</option>
-      <option v-for="type in activityTypes" :key="type.id" :value="type.id">
-        {{ type.name }}
-      </option>
-    </select>
+    <div>
+      <label for="">Tipo</label>
+      <select v-model="activityData.activity_type_id">
+        <option value="Tipo" disabled>Tipo</option>
+        <option v-for="type in activityTypes" :key="type.id" :value="type.id">
+          {{ type.name }}
+        </option>
+      </select>
+    </div>
 
-    <select v-model="activityData.status">
-      <option value="Status" disabled>Status</option>
-      <option v-for="status in statusTypes" :key="status.id" :value="status.id">
-        {{ status.name }}
-      </option>
-    </select>
+    <div>
+      <label for="">Status</label>
+      <select v-model="activityData.status">
+        <option value="Status" disabled>Status</option>
+        <option
+          v-for="status in statusTypes"
+          :key="status.id"
+          :value="status.id"
+        >
+          {{ status.name }}
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <label for="">Data de início</label>
+      <datepicker v-model="activityData.start_at" name="date-from"></datepicker>
+    </div>
 
     <button type="submit">Enviar</button>
   </form>
@@ -31,8 +49,13 @@
 <script>
   import ActivityHelper from '../gateway/ActivityHelper';
   import UserHelper from '../gateway/UserHelper';
+  import Datepicker from 'vuejs-datepicker';
+  import moment from 'moment';
 
   export default {
+    components: {
+      Datepicker,
+    },
     data() {
       return {
         isEditing: false,
@@ -67,7 +90,8 @@
           activity_type_id: 0,
           status: 0,
           priority: 1,
-          description: 'Teste',
+          description: '',
+          start_at: '',
         },
       };
     },
@@ -93,6 +117,7 @@
 
       async sendActivity() {
         if (this.isEditing) {
+          this.formatDate();
           await ActivityHelper.updateActivity(
             this.activityData,
             this.$route.params.activityId
@@ -101,11 +126,18 @@
             this.$router.push({ name: 'Home' });
           });
         } else {
+          this.formatDate();
           await ActivityHelper.createActivity(this.activityData).then(() => {
             this.isEditing = false;
             this.$router.push({ name: 'Home' });
           });
         }
+      },
+
+      formatDate() {
+        this.activityData.start_at = moment(
+          this.activityData.start_at
+        ).format();
       },
 
       getSpecificActivity() {

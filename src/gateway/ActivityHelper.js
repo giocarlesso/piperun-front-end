@@ -1,9 +1,10 @@
 import api from '../config/api';
 
 export default {
-  getActitivitiesList: () => {
+  getActitivitiesList: (params) => {
     return api
       .get('/activities', {
+        params: { show: 30, ...params },
         headers: {
           'Content-Type': 'application/json',
           Token: localStorage.getItem('Token'),
@@ -12,6 +13,19 @@ export default {
       .catch((err) => {
         console.log('Create Listy', err);
       });
+  },
+
+  getFilteredActivityByDate: (params) => {
+    return api
+      .get('/activities', {
+        params: { show: 30, ...params },
+        headers: {
+          'Content-Type': 'application/json',
+          Token: localStorage.getItem('Token'),
+        },
+      })
+      .then(console.log('Aqui'))
+      .catch((err) => console.log('Filter by date', err));
   },
 
   getActitivitiesTypes: () => {
