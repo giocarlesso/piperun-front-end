@@ -1,8 +1,9 @@
 <template>
-  <div class="toast" :class="checkToastType()">
-    <p>{{ type }}</p>
-    <p>{{ message }}</p>
-    <button class="close" @click="closeToast">X</button>
+  <div class="container">
+    <div class="toast" :class="checkToastType()">
+      <p>{{ message }}</p>
+      <button class="close" @click="closeToast">X</button>
+    </div>
   </div>
 </template>
 
@@ -28,29 +29,30 @@
 <style scoped>
   .toast {
     min-width: 250px;
-    margin-left: -125px;
     text-align: center;
-    border-radius: 2px;
-    padding: 16px;
+    border-radius: 3px;
+    margin-left: -125px;
+    padding: 10px;
     position: fixed;
-    z-index: 1;
     left: 50%;
+    z-index: 1;
     bottom: 30px;
+    font-size: 18px;
   }
 
   .success {
-    background-color: green;
+    background-color: #28a745;
     color: white;
   }
 
   .error {
-    background-color: red;
+    background-color: #dc3545;
     color: white;
   }
 
   .close {
     position: absolute;
-    background-color: green;
+    background-color: inherit;
     color: white;
     border: none;
     top: 10px;

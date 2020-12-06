@@ -251,13 +251,12 @@
   .container {
     display: flex;
     justify-content: center;
-    height: 100vh;
+    align-items: center;
+    width: 100vw;
+    height: 80vh;
   }
 
   .form-style {
-    margin: 10px auto;
-    max-width: 400px;
-    padding: 20px 12px 10px 20px;
     font: 20px Tahoma;
   }
 

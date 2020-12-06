@@ -3,10 +3,15 @@
     <nav class="vertical">
       <ul>
         <li class="sidebar-activities">
-          <router-link to="/home">Atividades</router-link>
+          <router-link to="/home">
+            <i class="far fa-list-alt"></i>Atividades</router-link
+          >
         </li>
         <li class="sidebar-logout">
-          <router-link @click="logout" to="/">Logout</router-link>
+          <button @click="logout">
+            Logout
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
         </li>
       </ul>
     </nav>
@@ -17,11 +22,8 @@
   export default {
     methods: {
       logout() {
-        //Limpa a localStorage do token e dados do usuário e destrói a sessão
-        localStorage.clear();
-        window.localStorage.removeItem('Token');
-        window.localStorage.removeItem('userData');
-        this.$session.destroy();
+        localStorage.setItem('Token', null);
+        this.$router.push('/');
       },
     },
   };
@@ -53,6 +55,15 @@
     display: block;
   }
 
+  .vertical button {
+    text-decoration: none;
+    border: none;
+    font-size: 25px;
+    color: white;
+    background-color: #454545;
+    display: block;
+  }
+
   .vertical a:hover {
     color: #f1f1f1;
   }
@@ -70,6 +81,17 @@
     width: 100%;
     bottom: 0;
     padding-bottom: 1.5em;
+  }
+
+  .fa-list-alt {
+    font-size: 50px;
+    color: white;
+  }
+
+  .fa-sign-out-alt {
+    margin-left: 10px;
+    font-size: 20px;
+    color: white;
   }
 
   @media screen and (max-height: 450px) {

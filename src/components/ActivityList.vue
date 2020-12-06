@@ -2,7 +2,7 @@
   <div class="main">
     <div class="top-div">
       <button class="btn-new" @click.prevent.stop="createNewActivity">
-        Adicionar Nova Atividade
+        Nova Atividade
       </button>
 
       <button v-if="isFiltering" class="btn-filter" @click="toggleFilter">
@@ -22,7 +22,9 @@
         <button class="btn-apply-filter" @click="getActitivitiesByDate">
           Filtrar
         </button>
-        <button @click="resetFilter">Cancelar Filtro</button>
+        <button class="btn-remove-filter" @click="resetFilter">
+          Cancelar Filtro
+        </button>
       </div>
     </div>
 
@@ -172,10 +174,13 @@
           })
           .catch(() => {
             this.sendDataToToast(
-              'Erro ao receber a lista de atividades',
+              'Erro ao receber a lista de atividades, tente atualizar a página',
               'Erro',
               true
             );
+          })
+          .finally(() => {
+            this.isLoading = false;
           });
       },
 
@@ -191,11 +196,7 @@
           start_at_end: this.filter.dateTo,
         }).then((res) => {
           this.activities = res.data.data;
-          this.sendDataToToast(
-            'Atividades filtradas com sucesso',
-            'Sucesso',
-            true
-          );
+          this.sendDataToToast('Filtro por data ativo', 'Sucesso', true);
           this.isLoading = false;
         });
       },
@@ -221,8 +222,8 @@
         );
       },
 
-      getUsers() {
-        UserHelper.getUsersList()
+      async getUsers() {
+        await UserHelper.getUsersList()
           .then((res) => (this.users = res.data.data))
           .catch(() => {
             this.sendDataToToast(
@@ -242,7 +243,6 @@
 
       findUserName(owner_id) {
         const foundUser = this.users.find((user) => user.id === owner_id);
-        JSON.stringify(foundUser);
         return foundUser.name;
       },
 
@@ -251,10 +251,18 @@
       },
 
       resetFilter() {
-        this.filter.dateFrom = null;
-        this.filter.dateTo = null;
-        this.isFiltering = false;
-        this.getActitivities();
+        if (this.filter.dateFrom === null || this.filter.dateTo === null) {
+          this.filter.dateFrom = null;
+          this.filter.dateTo = null;
+          this.isFiltering = false;
+          this.sendDataToToast('Filtro removido', 'Sucesso', true);
+        } else {
+          this.filter.dateFrom = null;
+          this.filter.dateTo = null;
+          this.isFiltering = false;
+          this.sendDataToToast('Filtro removido', 'Sucesso', true);
+          this.getActitivities();
+        }
       },
 
       sendDataToToast(message, type, show) {
@@ -280,15 +288,18 @@
   };
 </script>
 
-<style>
+<style scoped>
   .main {
     margin-left: 130px;
+    width: calc(100vw - 130px);
+    height: 95vh;
   }
   .table {
     border: 1px solid #191919;
     border-collapse: collapse;
     width: 99%;
     margin-top: 15px;
+    text-align: center;
   }
 
   th {
@@ -297,17 +308,14 @@
     text-align: center;
     height: 40px;
     padding: 0 5px 0 5px;
-    background-color: #f5f5f6;
+    background-color: #454545;
+    color: white;
   }
 
   td {
-    border-right: 1px solid #191919;
-    border-bottom: 1px solid #191919;
+    border: 1px solid #191919;
     height: 35px;
-  }
-
-  tfoot td {
-    border: none;
+    background-color: white;
   }
 
   .btn-new {
@@ -345,7 +353,19 @@
     color: white;
     border: none;
     border-radius: 3px;
+    margin: 0 10px;
+  }
+
+  .btn-remove-filter {
+    background-color: #eb7734;
+    color: white;
+    border: none;
+    border-radius: 3px;
     margin-right: 10px;
+  }
+
+  .btn-remove-filter:hover {
+    background-color: #a6511f;
   }
 
   .empty-list {

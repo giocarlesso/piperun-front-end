@@ -1,11 +1,9 @@
 import axios from 'axios';
 
-const api = axios.create({
+export default axios.create({
   baseURL: process.env.VUE_APP_API_URL,
   headers: {
-    Token: localStorage.getItem('token'),
+    Token: localStorage.getItem('Token'),
     'Content-Type': 'application/json',
   },
 });
-
-export default api;
