@@ -175,8 +175,8 @@
             this.$route.params.activityId
           )
             .then(() => {
-              this.isEditing = false;
               this.$router.push({ name: 'Home' });
+              this.isEditing = false;
             })
             .catch(() => {
               this.sendDataToToast(
@@ -199,6 +199,7 @@
       },
 
       getSpecificActivity() {
+        //Busca a atividade específica na API baseada no seu ID e popula os campos existentes com suas informações
         this.isLoading = true;
         ActivityHelper.getSpecificActivity(this.$route.params.activityId)
           .then((res) => {
@@ -237,6 +238,7 @@
     },
 
     mounted() {
+      //Verifica se existe algum parâmetro na rota e chama o método de buscar atividade específica baseado no parâmetro enviado. Se esse parâmetro existir, ela é uma view de edição já que a view de criação não recebe parâmetros.
       if (this.$route.params.activityId) {
         this.getSpecificActivity();
         this.isEditing = true;

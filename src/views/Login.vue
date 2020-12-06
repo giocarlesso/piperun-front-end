@@ -62,7 +62,9 @@
 
             localStorage.setItem('Token', token);
             localStorage.setItem('userData', userData);
+
             if (res.status === 200) {
+              //Apenas envia o usuário para a próxima view se a resposta da API for o código 200
               this.$router.push({
                 name: 'Home',
               });

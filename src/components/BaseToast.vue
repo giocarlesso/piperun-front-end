@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <div class="toast" :class="checkToastType()">
+      <p>{{ type }}</p>
       <p>{{ message }}</p>
       <button class="close" @click="closeToast">X</button>
     </div>
@@ -20,6 +21,7 @@
         }
       },
       closeToast() {
+        //Envia um emit para o parent component ao usuário clicar no X para fechar o toast antes do tempo pré selecionado
         this.$emit('close');
       },
     },

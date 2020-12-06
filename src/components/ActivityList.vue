@@ -163,14 +163,13 @@
 
       editActivity(activityId) {
         this.$router.push({
-          // path: `/create-activity/${activityId}`,
           name: 'EditActivity',
           params: { activityId },
         });
       },
 
       getActitivities() {
-        this.isLoading = true;
+        this.isLoading = true; //Chama o componente que mostra o carregamento dos dados para dar feedback ao usuário.
         ActivityHelper.getActitivitiesList()
           .then((res) => {
             this.activities = res.data.data;
@@ -184,16 +183,16 @@
             );
           })
           .finally(() => {
-            this.isLoading = false;
+            this.isLoading = false; //Esconde o componente assim que o caregamento acabe
           });
       },
 
       getActitivitiesByDate() {
         this.isLoading = true;
-        //const dateFormat = 'YYYYY-MM-DD';
+        //Formata as datas para que estejam no mesmo padrão que a API aceita
         this.filter.dateFrom = moment(this.filter.dateFrom).format();
         this.filter.dateTo = moment(this.filter.dateTo)
-          .add(1, 'days')
+          .add(1, 'days') //Adiciona um dia à data final escolhida no filtro para que o dia selecionado pelo usuário como filtro de data final seja inteiramente levado em conta quando as atividades retornarem
           .format();
         ActivityHelper.getFilteredActivityByDate({
           start_at_start: this.filter.dateFrom,
@@ -206,6 +205,7 @@
       },
 
       getActivityTypes() {
+        //Busca todos os tipos de atividades que existem na API para comparar e mostrar na tela
         ActivityHelper.getActitivitiesTypes().then((res) => {
           this.activityTypes = res.data.data;
         });
@@ -227,6 +227,7 @@
       },
 
       async getUsers() {
+        //Busca os usuários cadastrados no sistema para que apareçam na tela os seus nomes
         await UserHelper.getUsersList()
           .then((res) => (this.users = res.data.data))
           .catch(() => {
@@ -239,6 +240,7 @@
       },
 
       findStatusName(statusId) {
+        //Compara os ID's dos status de atividades que exitem com a ID de status da atividade selecionada
         const foundStatus = this.statusTypes.find(
           (status) => status.id === statusId
         );
@@ -246,6 +248,7 @@
       },
 
       findUserName(owner_id) {
+        //Compara o ID do usuário com o ID do owner da atividade
         const foundUser = this.users.find((user) => user.id === owner_id);
         return foundUser.name;
       },
@@ -255,6 +258,7 @@
       },
 
       resetFilter() {
+        // Reseta os filtros selecionados para que a lista de atividades venha sem filtros novamente, caso nenhum filtro tenha sido escolhido, simplesmente esconde o componente sem que uma nova busca seja feita no banco
         if (this.filter.dateFrom === null || this.filter.dateTo === null) {
           this.filter.dateFrom = null;
           this.filter.dateTo = null;
@@ -270,6 +274,7 @@
       },
 
       sendDataToToast(message, type, show) {
+        //Atualiza o componente de toast com o tipo de erro e mensagem para dar feedback ao usuário
         this.toast.toastMessage = message;
         this.toast.toastType = type;
         this.toast.showToast = show;
