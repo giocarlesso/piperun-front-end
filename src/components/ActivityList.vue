@@ -14,18 +14,22 @@
     </div>
 
     <div class="filter-container" v-if="isFiltering">
-      <label for="dete-from">Data Inicial</label>
-      <datepicker v-model="filter.dateFrom" name="date-from"></datepicker>
-      <label for="dete-to">Data Final</label>
-      <datepicker v-model="filter.dateTo" name="date-to"></datepicker>
-      <div class="filter-buttons">
-        <button class="btn-apply-filter" @click="getActitivitiesByDate">
-          Filtrar
-        </button>
-        <button class="btn-remove-filter" @click="resetFilter">
-          Cancelar Filtro
-        </button>
+      <div>
+        <label for="dete-from">Data Inicial</label>
+        <datepicker v-model="filter.dateFrom" name="date-from"></datepicker>
       </div>
+      <div>
+        <label for="dete-to">Data Final</label>
+        <datepicker v-model="filter.dateTo" name="date-to"></datepicker>
+      </div>
+
+      <div class="filter-buttons"></div>
+      <button class="btn-apply-filter" @click="getActitivitiesByDate">
+        Filtrar
+      </button>
+      <button class="btn-remove-filter" @click="resetFilter">
+        Cancelar Filtro
+      </button>
     </div>
 
     <div v-if="isLoading" class="empty-list">
@@ -43,7 +47,7 @@
           <td>{{ activity.title }}</td>
           <td>{{ findStatusName(activity.status) }}</td>
           <td>{{ findUserName(activity.owner_id) }}</td>
-          <td>
+          <td class="actions">
             <button @click="editActivity(activity.id)">
               Editar
             </button>
@@ -353,7 +357,7 @@
     color: white;
     border: none;
     border-radius: 3px;
-    margin: 0 10px;
+    height: 30px;
   }
 
   .btn-remove-filter {
@@ -361,7 +365,12 @@
     color: white;
     border: none;
     border-radius: 3px;
-    margin-right: 10px;
+    margin-left: 10px;
+    height: 30px;
+  }
+
+  .filter-buttons {
+    margin-top: 10px;
   }
 
   .btn-remove-filter:hover {
@@ -378,10 +387,5 @@
 
   .filter-container {
     margin-top: 10px;
-    display: flex;
-  }
-
-  .filter-buttons {
-    display: flex;
   }
 </style>
