@@ -1,82 +1,112 @@
 <template>
-  <div class="container">
-    <form class="form-style" @submit.prevent="sendActivity">
-      <h2 v-if="isEditing">Atualizar Atividade</h2>
-      <h2 v-else>Criar Atividade</h2>
-      <label for="title">Título<span class="required"> *</span></label>
-      <textarea
-        required
-        type="text"
-        rows="4"
-        cols="50"
-        name="title"
-        v-model="activityData.title"
-      />
-
-      <div>
-        <label for="">Responsável<span class="required"> *</span></label>
-        <select required v-model="activityData.owner_id">
-          <option value="Responsável" disabled>Responsável</option>
-          <option v-for="owner in owners" :key="owner.id" :value="owner.id">
-            {{ owner.name }}
-          </option>
-        </select>
-      </div>
-
-      <div>
-        <label for="">Tipo<span class="required"> *</span></label>
-        <select required v-model="activityData.activity_type_id">
-          <option value="Tipo" disabled>Tipo</option>
-          <option v-for="type in activityTypes" :key="type.id" :value="type.id">
-            {{ type.name }}
-          </option>
-        </select>
-      </div>
-
-      <div>
-        <label for="">Status</label>
-        <select v-model="activityData.status">
-          <option value="Status" disabled>Status</option>
-          <option
-            v-for="status in statusTypes"
-            :key="status.id"
-            :value="status.id"
-          >
-            {{ status.name }}
-          </option>
-        </select>
-      </div>
-
-      <div>
-        <label for="">Data de início<span class="required"> *</span></label>
-        <datepicker
+  <div>
+    <the-side-bar></the-side-bar>
+    <div class="container">
+      <base-loading-spinner v-if="isLoading"></base-loading-spinner>
+      <form v-else class="form-style" @submit.prevent="submitActivity">
+        <h2 v-if="isEditing">Atualizar Atividade</h2>
+        <h2 v-else>Criar Atividade</h2>
+        <label for="title">Título<span class="required"> *</span></label>
+        <textarea
           required
-          class="datepicker"
-          v-model="activityData.start_at"
-          name="date-from"
-        ></datepicker>
-      </div>
-      <button v-if="isEditing" class="btn-form" type="submit">Atualizar</button>
-      <button v-else class="btn-form" type="submit">Criar</button>
-    </form>
+          type="text"
+          rows="4"
+          cols="50"
+          name="title"
+          v-model="activityData.title"
+        />
+        <div>
+          <label for="">Responsável<span class="required"> *</span></label>
+          <select required v-model="activityData.owner_id">
+            <option value="Responsável" disabled>Responsável</option>
+            <option v-for="owner in owners" :key="owner.id" :value="owner.id">
+              {{ owner.name }}
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <label for="">Tipo<span class="required"> *</span></label>
+          <select required v-model="activityData.activity_type_id">
+            <option value="Tipo" disabled>Tipo</option>
+            <option
+              v-for="type in activityTypes"
+              :key="type.id"
+              :value="type.id"
+            >
+              {{ type.name }}
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <label for="">Status</label>
+          <select v-model="activityData.status">
+            <option value="Status" disabled>Status</option>
+            <option
+              v-for="status in statusTypes"
+              :key="status.id"
+              :value="status.id"
+            >
+              {{ status.name }}
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <label for="">Data de início<span class="required"> *</span></label>
+          <datepicker
+            required
+            class="datepicker"
+            v-model="activityData.start_at"
+            name="date-from"
+          ></datepicker>
+        </div>
+        <button v-if="isEditing" class="btn-form" type="submit">
+          Atualizar
+        </button>
+        <button v-else class="btn-form" type="submit">Criar</button>
+      </form>
+    </div>
+
+    <base-toast
+      @close="hideToast"
+      v-if="toast.showToast"
+      :message="toast.toastMessage"
+      :type="toast.toastType"
+    ></base-toast>
   </div>
 </template>
 
 <script>
   import ActivityHelper from '../gateway/ActivityHelper';
   import UserHelper from '../gateway/UserHelper';
+
   import Datepicker from 'vuejs-datepicker';
   import moment from 'moment';
+
+  import BaseLoadingSpinner from '../components/BaseLoadingSpinner';
+  import BaseToast from '../components/BaseToast';
+  import TheSideBar from '../components/TheSideBar';
 
   export default {
     components: {
       Datepicker,
+      BaseToast,
+      BaseLoadingSpinner,
+      TheSideBar,
     },
     data() {
       return {
         isEditing: false,
+        isLoading: false,
         owners: [],
         activityTypes: [],
+        toast: {
+          showToast: false,
+          toastMessage: '',
+          toastType: '',
+        },
         statusTypes: [
           {
             id: 0,
@@ -107,47 +137,86 @@
           status: 0,
           priority: 1,
           description: '',
-          start_at: '',
+          start_at: new Date(),
         },
       };
     },
 
     methods: {
-      async getUsers() {
-        await UserHelper.getUsersList().then((res) => {
-          this.owners = res.data.data;
-        });
+      getUsers() {
+        UserHelper.getUsersList()
+          .then((res) => {
+            this.owners = res.data.data;
+          })
+          .catch(() => {
+            this.sendDataToToast('Erro ao obter os usuários', 'Erro', true);
+          });
       },
 
-      async getActivityTypes() {
-        await ActivityHelper.getActitivitiesTypes().then((res) => {
-          this.activityTypes = res.data.data;
-        });
+      getActivityTypes() {
+        ActivityHelper.getActitivitiesTypes()
+          .then((res) => {
+            this.activityTypes = res.data.data;
+          })
+          .catch(() => {
+            this.sendDataToToast(
+              'Erro ao obter os tipos de atividade',
+              'Erro',
+              true
+            );
+          });
       },
 
-      async getActitivities() {
-        await ActivityHelper.getActitivitiesList().then(
-          (res) => (this.activities = res.data.data)
-        );
-      },
-
-      async sendActivity() {
+      submitActivity() {
         if (this.isEditing) {
           this.formatDate();
-          await ActivityHelper.updateActivity(
+          ActivityHelper.updateActivity(
             this.activityData,
             this.$route.params.activityId
-          ).then(() => {
-            this.isEditing = false;
-            this.$router.push({ name: 'Home' });
-          });
+          )
+            .then(() => {
+              this.isEditing = false;
+              this.$router.push({ name: 'Home' });
+            })
+            .catch(() => {
+              this.sendDataToToast(
+                'Erro ao atualizar a atividade',
+                'Erro',
+                true
+              );
+            });
         } else {
           this.formatDate();
-          await ActivityHelper.createActivity(this.activityData).then(() => {
-            this.isEditing = false;
-            this.$router.push({ name: 'Home' });
-          });
+          ActivityHelper.createActivity(this.activityData)
+            .then(() => {
+              this.isEditing = false;
+              this.$router.push({ name: 'Home' });
+            })
+            .catch(() => {
+              this.sendDataToToast('Erro ao criar a atividade', 'Erro', true);
+            });
         }
+      },
+
+      getSpecificActivity() {
+        this.isLoading = true;
+        ActivityHelper.getSpecificActivity(this.$route.params.activityId)
+          .then((res) => {
+            const selectedActivity = res.data.data;
+            this.activityData.title = selectedActivity.title;
+            this.activityData.owner_id = selectedActivity.owner_id;
+            this.activityData.activity_type_id =
+              selectedActivity.activity_type_id;
+            this.activityData.status = selectedActivity.status;
+            this.isLoading = false;
+          })
+          .catch(() => {
+            this.sendDataToToast(
+              'Erro ao obter os dados da atividade',
+              'Erro',
+              true
+            );
+          });
       },
 
       formatDate() {
@@ -156,17 +225,14 @@
         ).format();
       },
 
-      getSpecificActivity() {
-        ActivityHelper.getSpecificActivity(this.$route.params.activityId).then(
-          (res) => {
-            const selectedActivity = res.data.data;
-            this.activityData.title = selectedActivity.title;
-            this.activityData.owner_id = selectedActivity.owner_id;
-            this.activityData.activity_type_id =
-              selectedActivity.activity_type_id;
-            this.activityData.status = selectedActivity.status;
-          }
-        );
+      sendDataToToast(message, type, show) {
+        this.toast.toastMessage = message;
+        this.toast.toastType = type;
+        this.toast.showToast = show;
+
+        setTimeout(() => {
+          this.toast.showToast = false;
+        }, 4000);
       },
     },
 

@@ -43,10 +43,13 @@
     methods: {
       authenticate() {
         AuthenticateHelper.login(this.email, this.password)
-          .then(() => {
-            this.$router.push({
-              name: 'Home',
-            });
+          .then((res) => {
+            if (res.data.success === true) {
+              this.$session.start();
+              this.$router.push({
+                name: 'Home',
+              });
+            }
           })
           .catch((err) => {
             console.log(err);

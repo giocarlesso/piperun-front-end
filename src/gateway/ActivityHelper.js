@@ -1,8 +1,8 @@
 import api from '../config/api';
 
 export default {
-  getActitivitiesList: (params) => {
-    return api
+  getActitivitiesList: async (params) => {
+    return await api
       .get('/activities', {
         params: { show: 30, ...params },
         headers: {
@@ -15,8 +15,8 @@ export default {
       });
   },
 
-  getFilteredActivityByDate: (params) => {
-    return api
+  getFilteredActivityByDate: async (params) => {
+    return await api
       .get('/activities', {
         params: { show: 30, ...params },
         headers: {
@@ -28,8 +28,8 @@ export default {
       .catch((err) => console.log('Filter by date', err));
   },
 
-  getActitivitiesTypes: () => {
-    return api
+  getActitivitiesTypes: async () => {
+    return await api
       .get('/activityTypes', {
         headers: {
           'Content-Type': 'application/json',
@@ -41,8 +41,8 @@ export default {
       });
   },
 
-  createActivity: (activityData) => {
-    return api
+  createActivity: async (activityData) => {
+    return await api
       .post('/activities', activityData, {
         headers: {
           'Content-Type': 'application/json',
@@ -54,8 +54,8 @@ export default {
       });
   },
 
-  deleteActivity: (activityId) => {
-    return api
+  deleteActivity: async (activityId) => {
+    return await api
       .delete('/activities/' + activityId, {
         headers: {
           'Content-Type': 'application/json',
@@ -67,8 +67,8 @@ export default {
       });
   },
 
-  getSpecificActivity: (activityId) => {
-    return api.get('/activities/' + activityId, {
+  getSpecificActivity: async (activityId) => {
+    return await api.get('/activities/' + activityId, {
       headers: {
         'Content-Type': 'application/json',
         Token: localStorage.getItem('Token'),
@@ -76,8 +76,8 @@ export default {
     });
   },
 
-  updateActivity: (activityData, activityId) => {
-    return api.put('/activities/' + activityId, activityData, {
+  updateActivity: async (activityData, activityId) => {
+    return await api.put('/activities/' + activityId, activityData, {
       headers: {
         'Content-Type': 'application/json',
         Token: localStorage.getItem('Token'),
@@ -85,8 +85,8 @@ export default {
     });
   },
 
-  concludeActivity: (activityId, formatedDate, status) => {
-    return api
+  concludeActivity: async (activityId, formatedDate, status) => {
+    return await api
       .put(
         '/activities/' + activityId,
         { end_at: formatedDate, status: status },

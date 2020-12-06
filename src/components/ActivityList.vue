@@ -4,7 +4,11 @@
       <button class="btn-new" @click.prevent.stop="createNewActivity">
         Adicionar Nova Atividade
       </button>
-      <button class="btn-filter" @click="toggleFilter">
+
+      <button v-if="isFiltering" class="btn-filter" @click="toggleFilter">
+        Esconder Filtros
+      </button>
+      <button v-else class="btn-filter" @click="toggleFilter">
         Mostrar Filtros
       </button>
     </div>
@@ -22,7 +26,10 @@
       </div>
     </div>
 
-    <table v-if="this.activities.length > 0" class="table">
+    <div v-if="isLoading" class="empty-list">
+      <base-loading-spinner>Te4ste</base-loading-spinner>
+    </div>
+    <table v-else-if="this.activities.length > 0" class="table">
       <thead>
         <th>Título</th>
         <th>Status</th>
@@ -38,7 +45,10 @@
             <button @click="editActivity(activity.id)">
               Editar
             </button>
-            <button @click="concludeActivity(activity.id)">
+            <button
+              :disabled="activity.status == '2'"
+              @click="concludeActivity(activity.id)"
+            >
               Concluir
             </button>
             <button @click="deleteActivity(activity.id)">
@@ -48,8 +58,10 @@
         </tr>
       </tbody>
     </table>
-    <div class="empty-list" v-else>
-      <p>Parece que ainda não há nenhuma atividade</p>
+    <div v-else>
+      <p class="empty-list">
+        Nenhuma atividade encontrada.
+      </p>
     </div>
 
     <base-toast
@@ -64,14 +76,18 @@
 <script>
   import ActivityHelper from '../gateway/ActivityHelper';
   import UserHelper from '../gateway/UserHelper';
-  import BaseToast from '../components/BaseToast';
+
   import moment from 'moment';
+
   import Datepicker from 'vuejs-datepicker';
+  import BaseToast from '../components/BaseToast';
+  import BaseLoadingSpinner from './BaseLoadingSpinner.vue';
 
   export default {
     components: {
       Datepicker,
       BaseToast,
+      BaseLoadingSpinner,
     },
 
     data() {
@@ -79,6 +95,7 @@
         activities: [],
         users: [],
         isFiltering: false,
+        isLoading: false,
         toast: {
           showToast: false,
           toastMessage: '',
@@ -146,14 +163,16 @@
         });
       },
 
-      async getActitivities() {
-        await ActivityHelper.getActitivitiesList()
+      getActitivities() {
+        this.isLoading = true;
+        ActivityHelper.getActitivitiesList()
           .then((res) => {
             this.activities = res.data.data;
+            this.isLoading = false;
           })
           .catch(() => {
             this.sendDataToToast(
-              'Erro ao tentar receber a lista de atividades',
+              'Erro ao receber a lista de atividades',
               'Erro',
               true
             );
@@ -161,6 +180,7 @@
       },
 
       getActitivitiesByDate() {
+        this.isLoading = true;
         //const dateFormat = 'YYYYY-MM-DD';
         this.filter.dateFrom = moment(this.filter.dateFrom).format();
         this.filter.dateTo = moment(this.filter.dateTo)
@@ -176,6 +196,13 @@
             'Sucesso',
             true
           );
+          this.isLoading = false;
+        });
+      },
+
+      getActivityTypes() {
+        ActivityHelper.getActitivitiesTypes().then((res) => {
+          this.activityTypes = res.data.data;
         });
       },
 
@@ -195,7 +222,15 @@
       },
 
       getUsers() {
-        UserHelper.getUsersList().then((res) => (this.users = res.data.data));
+        UserHelper.getUsersList()
+          .then((res) => (this.users = res.data.data))
+          .catch(() => {
+            this.sendDataToToast(
+              'Erro ao buscar a lista de usuários',
+              'Erro',
+              true
+            );
+          });
       },
 
       findStatusName(statusId) {
@@ -213,12 +248,12 @@
 
       toggleFilter() {
         this.isFiltering = !this.isFiltering;
-        this.resetFilter();
       },
 
       resetFilter() {
         this.filter.dateFrom = null;
         this.filter.dateTo = null;
+        this.isFiltering = false;
         this.getActitivities();
       },
 
@@ -229,7 +264,7 @@
 
         setTimeout(() => {
           this.toast.showToast = false;
-        }, 5000);
+        }, 4000);
       },
 
       hideToast() {
@@ -240,6 +275,7 @@
     mounted() {
       this.getUsers();
       this.getActitivities();
+      this.getActivityTypes();
     },
   };
 </script>
