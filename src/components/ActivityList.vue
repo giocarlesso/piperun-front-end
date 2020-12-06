@@ -6,7 +6,7 @@
       </button>
 
       <button v-if="isFiltering" class="btn-filter" @click="toggleFilter">
-        Esconder Filtros
+        Omitir Filtros
       </button>
       <button v-else class="btn-filter" @click="toggleFilter">
         Mostrar Filtros

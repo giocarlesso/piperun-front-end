@@ -72,7 +72,7 @@
           })
           .catch(() => {
             this.sendDataToToast(
-              'Erro ao tentar o login, tente novamente',
+              'Email ou senha incorretos, tente novamente',
               'Erro',
               true
             );
