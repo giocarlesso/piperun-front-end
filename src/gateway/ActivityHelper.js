@@ -5,7 +5,7 @@ export default {
     return await api
       .get('/activities', { params: { show: 30, ...params } })
       .catch((err) => {
-        console.log('Create Listy', err);
+        console.log('Get List', err);
       });
   },
 
